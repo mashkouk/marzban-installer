@@ -31,7 +31,6 @@ while true; do
       echo ""
 
       ENV_FILE="/opt/marzban/.env"
-
       if [[ -f "$ENV_FILE" ]]; then
         sed -i "s|^UVICORN_PORT *=.*|UVICORN_PORT=$PORT|" "$ENV_FILE"
         sed -i "s|^# XRAY_SUBSCRIPTION_URL_PREFIX *=.*|XRAY_SUBSCRIPTION_URL_PREFIX=\"https://$DOMAIN:$PORT\"|" "$ENV_FILE"
@@ -54,7 +53,6 @@ while true; do
       marzban cli admin create --sudo
 
       echo "✅ Panel ba movafaghiat nasb shod."
-
       read -p "Baraye bazgasht be menu Enter bezanid..."
       ;;
     2)
@@ -68,10 +66,9 @@ while true; do
       cp /etc/letsencrypt/live/$DOMAIN/privkey.pem /var/lib/marzban/certs/$DOMAIN/privkey.pem
 
       ENV_FILE="/etc/opt/marzneshin/.env"
-
       if [[ -f "$ENV_FILE" ]]; then
-        sed -i "s|^# UVICORN_SSL_CERTFILE = \"/var/lib/marzban/certs/example.com/fullchain.pem\"|UVICORN_SSL_CERTFILE=\"/var/lib/marzban/certs/$DOMAIN/fullchain.pem\"|" "$ENV_FILE"
-        sed -i "s|^# UVICORN_SSL_KEYFILE = \"/var/lib/marzban/certs/example.com/key.pem\"|UVICORN_SSL_KEYFILE=\"/var/lib/marzban/certs/$DOMAIN/privkey.pem\"|" "$ENV_FILE"
+        sed -i "s|^# UVICORN_SSL_CERTFILE *=.*|UVICORN_SSL_CERTFILE=\"/var/lib/marzban/certs/$DOMAIN/fullchain.pem\"|" "$ENV_FILE"
+        sed -i "s|^# UVICORN_SSL_KEYFILE *=.*|UVICORN_SSL_KEYFILE=\"/var/lib/marzban/certs/$DOMAIN/privkey.pem\"|" "$ENV_FILE"
       else
         echo "⚠️ File settings peyda nashod: $ENV_FILE"
       fi
@@ -121,4 +118,4 @@ while true; do
       sleep 2
       ;;
   esac
-done
+d
