@@ -31,6 +31,7 @@ while true; do
       echo ""
 
       ENV_FILE="/opt/marzban/.env"
+
       if [[ -f "$ENV_FILE" ]]; then
         sed -i "s|^UVICORN_PORT *=.*|UVICORN_PORT=$PORT|" "$ENV_FILE"
         sed -i "s|^# XRAY_SUBSCRIPTION_URL_PREFIX *=.*|XRAY_SUBSCRIPTION_URL_PREFIX=\"https://$DOMAIN:$PORT\"|" "$ENV_FILE"
@@ -53,6 +54,7 @@ while true; do
       marzban cli admin create --sudo
 
       echo "✅ Panel ba movafaghiat nasb shod."
+
       read -p "Baraye bazgasht be menu Enter bezanid..."
       ;;
     2)
@@ -62,13 +64,21 @@ while true; do
       mkdir -p /var/lib/marzban/certs/$DOMAIN
 
       certbot certonly --standalone --agree-tos --register-unsafely-without-email -d $DOMAIN
-      cp /etc/letsencrypt/live/$DOMAIN/fullchain.pem /var/lib/marzban/certs/$DOMAIN/fullchain.pem
-      cp /etc/letsencrypt/live/$DOMAIN/privkey.pem /var/lib/marzban/certs/$DOMAIN/privkey.pem
+
+      CERT_DIR=$(ls -d /etc/letsencrypt/live/${DOMAIN}*)
+
+      if [[ -d "$CERT_DIR" ]]; then
+        cp "$CERT_DIR/fullchain.pem" /var/lib/marzban/certs/$DOMAIN/fullchain.pem
+        cp "$CERT_DIR/privkey.pem" /var/lib/marzban/certs/$DOMAIN/privkey.pem
+      else
+        echo "⚠️ Cert directory not found for domain $DOMAIN"
+      fi
 
       ENV_FILE="/etc/opt/marzneshin/.env"
+
       if [[ -f "$ENV_FILE" ]]; then
-        sed -i "s|^# UVICORN_SSL_CERTFILE *=.*|UVICORN_SSL_CERTFILE=\"/var/lib/marzban/certs/$DOMAIN/fullchain.pem\"|" "$ENV_FILE"
-        sed -i "s|^# UVICORN_SSL_KEYFILE *=.*|UVICORN_SSL_KEYFILE=\"/var/lib/marzban/certs/$DOMAIN/privkey.pem\"|" "$ENV_FILE"
+        sed -i "s|^# *UVICORN_SSL_CERTFILE *=.*|UVICORN_SSL_CERTFILE=\"/var/lib/marzban/certs/$DOMAIN/fullchain.pem\"|" "$ENV_FILE"
+        sed -i "s|^# *UVICORN_SSL_KEYFILE *=.*|UVICORN_SSL_KEYFILE=\"/var/lib/marzban/certs/$DOMAIN/privkey.pem\"|" "$ENV_FILE"
       else
         echo "⚠️ File settings peyda nashod: $ENV_FILE"
       fi
@@ -94,6 +104,7 @@ while true; do
 
       CONF_FILE="/root/wgcf-profile.conf"
       if [[ -f "$CONF_FILE" ]]; then
+        # Insert 'Table = off' after 'MTU = 1280'
         sed -i '/^MTU = 1280/a Table = off' "$CONF_FILE"
         echo "✅ Table = off ezafe shod."
       else
@@ -118,4 +129,4 @@ while true; do
       sleep 2
       ;;
   esac
-d
+done
