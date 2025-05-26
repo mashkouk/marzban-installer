@@ -47,18 +47,7 @@ while true; do
       unzip -o /tmp/app.zip -d /var/lib/marzban/
       rm /tmp/app.zip
 
-      # Download xray_config.json
-      XRAY_FILE="/var/lib/marzban/xray_config.json"
-      curl -fsSL https://raw.githubusercontent.com/mashkouk/files-marzban-configer/refs/heads/main/xray_config.json -o "$XRAY_FILE"
-
-      if [[ -f "$XRAY_FILE" ]]; then
-        sed -i "65s|\".*\"|\"/var/lib/marzban/certs/$DOMAIN/fullchain.pem\"|" "$XRAY_FILE"
-        sed -i "66s|\".*\"|\"/var/lib/marzban/certs/$DOMAIN/privkey.pem\"|" "$XRAY_FILE"
-      else
-        echo "⚠️ File xray_config peyda nashod."
-      fi
-
-      echo "🔄 Restart Marzban..."
+      echo "🔁 Restart Marzban..."
       marzban restart
 
       echo "👤 Sakht admin hesab:"
@@ -98,7 +87,7 @@ while true; do
         echo "⚠️ File xray_config peyda nashod."
       fi
 
-      echo "🔄 Restart Marzban..."
+      echo "🔁 Restart Marzban..."
       marzban restart
       echo "✅ SSL gerefte shod."
 
@@ -128,7 +117,7 @@ while true; do
       mv /root/wgcf-profile.conf /etc/wireguard/warp.conf
       systemctl enable --now wg-quick@warp
 
-      echo "🔄 Restart Marzban..."
+      echo "🔁 Restart Marzban..."
       marzban restart
       echo "✅ Warp ba movafaghiat nasb shod."
 
