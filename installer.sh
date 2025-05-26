@@ -1,34 +1,33 @@
 #!/bin/bash
 
-# 🔧 نصب پیش‌نیازها
-echo "در حال نصب پیش‌نیازها (unzip و certbot)..."
+# 🔧 Install prerequisites
+echo "Installing prerequisites (unzip and certbot)..."
 apt-get update -y
 apt-get install unzip certbot -y
 
-# ✅ منوی اصلی
+# ✅ Main Menu
 while true; do
   clear
-  echo "===== منوی اصلی ====="
-  echo "1. نصب پنل مرزبان"
-  echo "2. گرفتن سرتیفیکیت (SSL)"
-  echo "3. نصب وارپ (Warp)"
-  echo "4. خروج"
+  echo "===== MAIN MENU ====="
+  echo "1. Nasb Panel Marzban"
+  echo "2. Gereftan Certificate (SSL)"
+  echo "3. Nasb Warp (WARP)"
+  echo "4. Khorooj"
   echo "======================"
-  read -p "لطفاً شماره گزینه مورد نظر را وارد کنید: " choice
+  read -p "Lotfan shomare gozine ra vared konid: " choice
 
   case $choice in
     1)
       echo ""
-      echo "✅ در حال نصب پنل مرزبان..."
+      echo "✅ Dar hale nasb panel Marzban..."
       bash -c "$(curl -sL https://github.com/Gozargah/Marzban-scripts/raw/master/marzban.sh)" @ install --database mariadb
-      echo "✅ نصب پنل مرزبان انجام شد."
+      echo "✅ Nasb panel Marzban anjam shod."
 
-      # دریافت دامنه و پورت
-      read -p "🌐 دامنه پنل را وارد کنید (مثال: panel.example.com): " DOMAIN
-      read -p "🔌 شماره پورت پنل را وارد کنید (مثال: 8000): " PORT
+      read -p "🌐 Domain panel ra vared konid (e.g. panel.example.com): " DOMAIN
+      read -p "🔌 Port panel ra vared konid (e.g. 8000): " PORT
 
       echo ""
-      echo "⚠️  لطفاً توجه داشته باشید: پس از نصب باید از گزینه ۲ گواهی SSL دریافت کنید."
+      echo "⚠️ Lotfan tavajoh konid: bayad ba gozine 2 certificate (SSL) daryaft konid."
       echo ""
 
       ENV_FILE="/opt/marzban/.env"
@@ -37,27 +36,26 @@ while true; do
         sed -i "s|^UVICORN_PORT *=.*|UVICORN_PORT=$PORT|" "$ENV_FILE"
         sed -i "s|^# XRAY_SUBSCRIPTION_URL_PREFIX *=.*|XRAY_SUBSCRIPTION_URL_PREFIX=\"https://$DOMAIN:$PORT\"|" "$ENV_FILE"
       else
-        echo "⚠️ فایل تنظیمات پیدا نشد: $ENV_FILE"
+        echo "⚠️ File settings peyda nashod: $ENV_FILE"
       fi
 
-      # جایگزینی docker-compose.yml
+      # Replace docker-compose.yml
       curl -fsSL https://raw.githubusercontent.com/mashkouk/files-marzban-configer/refs/heads/main/docker-compose.yml -o /opt/marzban/docker-compose.yml
 
-      # استخراج فایل app.zip
+      # Extract app.zip
       curl -fsSL https://raw.githubusercontent.com/mashkouk/files-marzban-configer/refs/heads/main/app.zip -o /tmp/app.zip
       unzip -o /tmp/app.zip -d /var/lib/marzban/
       rm /tmp/app.zip
 
-      # ری‌استارت مرزبان
-      echo "🔄 ری‌استارت مرزبان..."
+      echo "🔄 Restart Marzban..."
       marzban restart
-      echo "✅ پایان عملیات."
+      echo "✅ Done."
 
-      read -p "برای بازگشت به منو Enter بزنید..."
+      read -p "Baraye bazgasht be menu Enter bezanid..."
       ;;
     2)
       echo ""
-      read -p "🌐 دامنه را وارد کنید (مثال: panel.example.com): " DOMAIN
+      read -p "🌐 Domain ra vared konid (e.g. panel.example.com): " DOMAIN
 
       mkdir -p /var/lib/marzban/certs/$DOMAIN
 
@@ -71,18 +69,18 @@ while true; do
         sed -i "s|^# UVICORN_SSL_CERTFILE *=.*|UVICORN_SSL_CERTFILE=\"/var/lib/marzban/certs/$DOMAIN/fullchain.pem\"|" "$ENV_FILE"
         sed -i "s|^# UVICORN_SSL_KEYFILE *=.*|UVICORN_SSL_KEYFILE=\"/var/lib/marzban/certs/$DOMAIN/privkey.pem\"|" "$ENV_FILE"
       else
-        echo "⚠️ فایل تنظیمات پیدا نشد: $ENV_FILE"
+        echo "⚠️ File settings peyda nashod: $ENV_FILE"
       fi
 
-      echo "🔄 ری‌استارت مرزبان..."
+      echo "🔄 Restart Marzban..."
       marzban restart
-      echo "✅ پایان عملیات."
+      echo "✅ SSL gerefte shod."
 
-      read -p "برای بازگشت به منو Enter بزنید..."
+      read -p "Baraye bazgasht be menu Enter bezanid..."
       ;;
     3)
       echo ""
-      echo "✅ در حال نصب وارپ (Warp)..."
+      echo "✅ Dar hale nasb Warp..."
       apt update -y
       apt install wireguard-dkms wireguard-tools resolvconf -y
 
@@ -96,26 +94,26 @@ while true; do
       CONF_FILE="/root/wgcf-profile.conf"
       if [[ -f "$CONF_FILE" ]]; then
         sed -i '/^MTU = 1280/a Table = off' "$CONF_FILE"
-        echo "✅ خط 'Table = off' اضافه شد."
+        echo "✅ Table = off ezafe shod."
       else
-        echo "⚠️ فایل کانفیگ پیدا نشد."
+        echo "⚠️ File config peyda nashod."
       fi
 
       mv /root/wgcf-profile.conf /etc/wireguard/warp.conf
       systemctl enable --now wg-quick@warp
 
-      echo "🔄 ری‌استارت مرزبان..."
+      echo "🔄 Restart Marzban..."
       marzban restart
-      echo "✅ نصب وارپ کامل شد."
+      echo "✅ Warp ba movafaghiat nasb shod."
 
-      read -p "برای بازگشت به منو Enter بزنید..."
+      read -p "Baraye bazgasht be menu Enter bezanid..."
       ;;
     4)
-      echo "👋 خروج از برنامه. موفق باشید!"
+      echo "👋 Khorooj az barname. Movafagh bashid!"
       exit 0
       ;;
     *)
-      echo "❌ گزینه نامعتبر. لطفاً یکی از گزینه‌های 1 تا 4 را انتخاب کنید."
+      echo "❌ Gozine namotabar. Lotfan 1 ta 4 entekhab konid."
       sleep 2
       ;;
   esac
