@@ -47,7 +47,7 @@ while true; do
       unzip -o /tmp/app.zip -d /var/lib/marzban/
       rm /tmp/app.zip
 
-      # Download and modify xray_config.json
+      # Download xray_config.json
       XRAY_FILE="/var/lib/marzban/xray_config.json"
       curl -fsSL https://raw.githubusercontent.com/mashkouk/files-marzban-configer/refs/heads/main/xray_config.json -o "$XRAY_FILE"
 
@@ -60,7 +60,11 @@ while true; do
 
       echo "🔄 Restart Marzban..."
       marzban restart
-      echo "✅ Done."
+
+      echo "👤 Sakht admin hesab:"
+      marzban cli admin create --sudo
+
+      echo "✅ Panel ba movafaghiat nasb shod."
 
       read -p "Baraye bazgasht be menu Enter bezanid..."
       ;;
@@ -81,6 +85,17 @@ while true; do
         sed -i "s|^# UVICORN_SSL_KEYFILE *=.*|UVICORN_SSL_KEYFILE=\"/var/lib/marzban/certs/$DOMAIN/privkey.pem\"|" "$ENV_FILE"
       else
         echo "⚠️ File settings peyda nashod: $ENV_FILE"
+      fi
+
+      # Download and modify xray_config.json
+      XRAY_FILE="/var/lib/marzban/xray_config.json"
+      curl -fsSL https://raw.githubusercontent.com/mashkouk/files-marzban-configer/refs/heads/main/xray_config.json -o "$XRAY_FILE"
+
+      if [[ -f "$XRAY_FILE" ]]; then
+        sed -i "65s|\".*\"|\"/var/lib/marzban/certs/$DOMAIN/fullchain.pem\"|" "$XRAY_FILE"
+        sed -i "66s|\".*\"|\"/var/lib/marzban/certs/$DOMAIN/privkey.pem\"|" "$XRAY_FILE"
+      else
+        echo "⚠️ File xray_config peyda nashod."
       fi
 
       echo "🔄 Restart Marzban..."
