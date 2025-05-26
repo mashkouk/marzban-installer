@@ -12,8 +12,7 @@ while true; do
   echo "1. Nasb Panel Marzban"
   echo "2. Gereftan Certificate (SSL)"
   echo "3. Nasb Warp (WARP)"
-  echo "4. Download va Modify xray_config.json"
-  echo "5. Khorooj"
+  echo "4. Khorooj"
   echo "======================"
   read -p "Lotfan shomare gozine ra vared konid: " choice
 
@@ -71,8 +70,8 @@ while true; do
       ENV_FILE="/etc/opt/marzneshin/.env"
 
       if [[ -f "$ENV_FILE" ]]; then
-        sed -i "s|^# UVICORN_SSL_CERTFILE *=.*|UVICORN_SSL_CERTFILE=\"/var/lib/marzban/certs/$DOMAIN/fullchain.pem\"|" "$ENV_FILE"
-        sed -i "s|^# UVICORN_SSL_KEYFILE *=.*|UVICORN_SSL_KEYFILE=\"/var/lib/marzban/certs/$DOMAIN/privkey.pem\"|" "$ENV_FILE"
+        sed -i "s|^[# ]*UVICORN_SSL_CERTFILE *=.*|UVICORN_SSL_CERTFILE=\"/var/lib/marzban/certs/$DOMAIN/fullchain.pem\"|" "$ENV_FILE"
+        sed -i "s|^[# ]*UVICORN_SSL_KEYFILE *=.*|UVICORN_SSL_KEYFILE=\"/var/lib/marzban/certs/$DOMAIN/privkey.pem\"|" "$ENV_FILE"
       else
         echo "⚠️ File settings peyda nashod: $ENV_FILE"
       fi
@@ -114,30 +113,11 @@ while true; do
       read -p "Baraye bazgasht be menu Enter bezanid..."
       ;;
     4)
-      echo ""
-      read -p "🌐 Domain ra baraye xray_config vared konid (e.g. panel.example.com): " DOMAIN
-      XRAY_FILE="/var/lib/marzban/xray_config.json"
-      curl -fsSL https://raw.githubusercontent.com/mashkouk/files-marzban-configer/refs/heads/main/xray_config.json -o "$XRAY_FILE"
-
-      if [[ -f "$XRAY_FILE" ]]; then
-        sed -i "65s|\".*\"|\"/var/lib/marzban/certs/$DOMAIN/fullchain.pem\"|" "$XRAY_FILE"
-        sed -i "66s|\".*\"|\"/var/lib/marzban/certs/$DOMAIN/privkey.pem\"|" "$XRAY_FILE"
-        echo "✅ xray_config.json ba movafaghiat update shod."
-      else
-        echo "⚠️ File xray_config peyda nashod."
-      fi
-
-      echo "🔁 Restart Marzban..."
-      marzban restart
-
-      read -p "Baraye bazgasht be menu Enter bezanid..."
-      ;;
-    5)
       echo "👋 Khorooj az barname. Movafagh bashid!"
       exit 0
       ;;
     *)
-      echo "❌ Gozine namotabar. Lotfan 1 ta 5 entekhab konid."
+      echo "❌ Gozine namotabar. Lotfan 1 ta 4 entekhab konid."
       sleep 2
       ;;
   esac
