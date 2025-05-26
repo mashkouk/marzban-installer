@@ -70,8 +70,8 @@ while true; do
       ENV_FILE="/etc/opt/marzneshin/.env"
 
       if [[ -f "$ENV_FILE" ]]; then
-        sed -i "s|^[# ]*UVICORN_SSL_CERTFILE *=.*|UVICORN_SSL_CERTFILE=\"/var/lib/marzban/certs/$DOMAIN/fullchain.pem\"|" "$ENV_FILE"
-        sed -i "s|^[# ]*UVICORN_SSL_KEYFILE *=.*|UVICORN_SSL_KEYFILE=\"/var/lib/marzban/certs/$DOMAIN/privkey.pem\"|" "$ENV_FILE"
+        sed -i "s|^# UVICORN_SSL_CERTFILE = \"/var/lib/marzban/certs/example.com/fullchain.pem\"|UVICORN_SSL_CERTFILE=\"/var/lib/marzban/certs/$DOMAIN/fullchain.pem\"|" "$ENV_FILE"
+        sed -i "s|^# UVICORN_SSL_KEYFILE = \"/var/lib/marzban/certs/example.com/key.pem\"|UVICORN_SSL_KEYFILE=\"/var/lib/marzban/certs/$DOMAIN/privkey.pem\"|" "$ENV_FILE"
       else
         echo "⚠️ File settings peyda nashod: $ENV_FILE"
       fi
