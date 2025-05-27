@@ -57,6 +57,7 @@ while true; do
 
       read -p "Baraye bazgasht be menu Enter bezanid..."
       ;;
+
     2)
       echo ""
       read -p "🌐 Domain ra vared konid (e.g. panel.example.com): " DOMAIN
@@ -74,11 +75,18 @@ while true; do
         echo "⚠️ Cert directory not found for domain $DOMAIN"
       fi
 
-      ENV_FILE="/etc/opt/marzneshin/.env"
+      ENV_FILE="/opt/marzban/.env"
 
       if [[ -f "$ENV_FILE" ]]; then
-        sed -i "s|^# *UVICORN_SSL_CERTFILE *=.*|UVICORN_SSL_CERTFILE=\"/var/lib/marzban/certs/$DOMAIN/fullchain.pem\"|" "$ENV_FILE"
-        sed -i "s|^# *UVICORN_SSL_KEYFILE *=.*|UVICORN_SSL_KEYFILE=\"/var/lib/marzban/certs/$DOMAIN/privkey.pem\"|" "$ENV_FILE"
+        # حذف خطوط قدیمی (کامنت شده یا نشده)
+        sed -i '/UVICORN_SSL_CERTFILE/d' "$ENV_FILE"
+        sed -i '/UVICORN_SSL_KEYFILE/d' "$ENV_FILE"
+
+        # افزودن خطوط جدید به انتهای فایل
+        echo "UVICORN_SSL_CERTFILE=\"/var/lib/marzban/certs/$DOMAIN/fullchain.pem\"" >> "$ENV_FILE"
+        echo "UVICORN_SSL_KEYFILE=\"/var/lib/marzban/certs/$DOMAIN/privkey.pem\"" >> "$ENV_FILE"
+
+        echo "✅ فایل .env ba movafaghiat update shod."
       else
         echo "⚠️ File settings peyda nashod: $ENV_FILE"
       fi
@@ -89,6 +97,7 @@ while true; do
 
       read -p "Baraye bazgasht be menu Enter bezanid..."
       ;;
+
     3)
       echo ""
       echo "✅ Dar hale nasb Warp..."
@@ -120,10 +129,12 @@ while true; do
 
       read -p "Baraye bazgasht be menu Enter bezanid..."
       ;;
+
     4)
       echo "👋 Khorooj az barname. Movafagh bashid!"
       exit 0
       ;;
+
     *)
       echo "❌ Gozine namotabar. Lotfan 1 ta 4 entekhab konid."
       sleep 2
