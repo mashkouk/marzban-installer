@@ -148,15 +148,15 @@ while true; do
       mkdir -p "$CORE_DIR"
       TEMP_ZIP="/tmp/xray-core.zip"
 
-      read -p "🔗 Link file هسته xray را وارد کنید: " DOWNLOAD_URL
+      read -p "🔗 linke haste delkhah ra vared konid: " DOWNLOAD_URL
 
-      echo "⬇️ در حال دانلود از: $DOWNLOAD_URL"
+      echo "⬇️ dar hale download: $DOWNLOAD_URL"
       wget -O "$TEMP_ZIP" "$DOWNLOAD_URL"
 
       if [[ $? -ne 0 ]]; then
-        echo "❌ دانلود ناموفق بود."
+        echo "❌ download namovafagh."
         rm -f "$TEMP_ZIP"
-        read -p "برای بازگشت به منو Enter را فشار دهید..."
+        read -p "baraye bazgasht be menu inter ra bezanid ..."
         continue
       fi
 
@@ -166,10 +166,10 @@ while true; do
       XRAY_BIN="$CORE_DIR/xray"
       if [[ -f "$XRAY_BIN" ]]; then
         chmod +x "$XRAY_BIN"
-        echo "✅ هسته با موفقیت در $XRAY_BIN قرار گرفت."
+        echo "✅ haste ba movafaghiat dar $XRAY_BIN gharar gereft."
       else
-        echo "❌ فایل اجرایی xray پیدا نشد در: $CORE_DIR"
-        read -p "برای بازگشت به منو Enter را فشار دهید..."
+        echo "❌ fayle ejraee xray peyda nashod: $CORE_DIR"
+        read -p "baraye bazgasht be menu inter ra bezanid..."
         continue
       fi
 
@@ -178,20 +178,20 @@ while true; do
         grep -q "XRAY_EXECUTABLE_PATH" "$ENV_FILE" && \
           sed -i "s|^XRAY_EXECUTABLE_PATH=.*|XRAY_EXECUTABLE_PATH=\"$XRAY_BIN\"|" "$ENV_FILE" || \
           echo "XRAY_EXECUTABLE_PATH=\"$XRAY_BIN\"" >> "$ENV_FILE"
-        echo "📌 مسیر اجرا به فایل .env اضافه شد."
+        echo "📌masire ejra be file .env ezafe shod."
       else
-        echo "⚠️ فایل .env پیدا نشد: $ENV_FILE"
+        echo "⚠️ file .env peyda nashod: $ENV_FILE"
       fi
 
       echo "🔁 ریستارت Marzban..."
       marzban restart
-      echo "✅ تغییر هسته انجام شد."
+      echo "✅ taghir haste anjam shod..."
 
-      read -p "برای بازگشت به منو Enter را فشار دهید..."
+      read -p "baraye bazgasht be menu inter ra bezanid..."
       ;;
 
     5)
-      echo "👋 خروج از برنامه. موفق باشید!"
+      echo "👋 exit , movafagh bashid !"
       exit 0
       ;;
 
