@@ -144,62 +144,19 @@ while true; do
       echo ""
       echo "🧠 Taghir heste Marzban"
 
-      ARCH=$(uname -m)
-      case "$ARCH" in
-        x86_64)
-          ARCH_DL="amd64"
-          ;;
-        aarch64 | arm64)
-          ARCH_DL="arm64"
-          ;;
-        *)
-          echo "⚠️ معماری ناشناخته: $ARCH"
-          read -p "Baraye bazgasht be menu Enter bezanid..."
-          continue
-          ;;
-      esac
-
-      LATEST_XRAY_VERSION=$(curl -s https://api.github.com/repos/XTLS/Xray-core/releases/latest | grep tag_name | cut -d '"' -f4)
-      XRAY_URL="https://github.com/XTLS/Xray-core/releases/download/${LATEST_XRAY_VERSION}/Xray-linux-${ARCH_DL}.zip"
-
-      LATEST_GFW_VERSION=$(curl -s https://api.github.com/repos/GFW-knocker/Xray-core/releases/latest | grep tag_name | cut -d '"' -f4)
-      GFW_URL="https://github.com/GFW-knocker/Xray-core/releases/download/${LATEST_GFW_VERSION}/Xray-linux-${ARCH_DL}.zip"
-
-      echo ""
-      echo "🔧 Gozine mored nazar ra entekhab konid:"
-      echo "1. Xray-core rasmi (XTLS) - $LATEST_XRAY_VERSION"
-      echo "2. Xray-core GFW-knocker - $LATEST_GFW_VERSION"
-      echo "3. Link delkhah"
-      read -p "Shomare gozine ra vared konid: " CORE_CHOICE
-
-      case $CORE_CHOICE in
-        1)
-          DOWNLOAD_URL="$XRAY_URL"
-          ;;
-        2)
-          DOWNLOAD_URL="$GFW_URL"
-          ;;
-        3)
-          read -p "🔗 Link delkhah ra vared konid: " DOWNLOAD_URL
-          ;;
-        *)
-          echo "❌ Gozine namotabar."
-          read -p "Baraye bazgasht be menu Enter bezanid..."
-          continue
-          ;;
-      esac
-
       CORE_DIR="/var/lib/marzban/xray-core"
       mkdir -p "$CORE_DIR"
       TEMP_ZIP="/tmp/xray-core.zip"
 
-      echo "⬇️ Dar hale download az: $DOWNLOAD_URL"
+      read -p "🔗 Link file هسته xray را وارد کنید: " DOWNLOAD_URL
+
+      echo "⬇️ در حال دانلود از: $DOWNLOAD_URL"
       wget -O "$TEMP_ZIP" "$DOWNLOAD_URL"
 
       if [[ $? -ne 0 ]]; then
         echo "❌ دانلود ناموفق بود."
         rm -f "$TEMP_ZIP"
-        read -p "Baraye bazgasht be menu Enter bezanid..."
+        read -p "برای بازگشت به منو Enter را فشار دهید..."
         continue
       fi
 
@@ -209,10 +166,10 @@ while true; do
       XRAY_BIN="$CORE_DIR/xray"
       if [[ -f "$XRAY_BIN" ]]; then
         chmod +x "$XRAY_BIN"
-        echo "✅ Heste ba movafaghiat dar $XRAY_BIN gharar gereft."
+        echo "✅ هسته با موفقیت در $XRAY_BIN قرار گرفت."
       else
         echo "❌ فایل اجرایی xray پیدا نشد در: $CORE_DIR"
-        read -p "Baraye bazgasht be menu Enter bezanid..."
+        read -p "برای بازگشت به منو Enter را فشار دهید..."
         continue
       fi
 
@@ -221,25 +178,25 @@ while true; do
         grep -q "XRAY_EXECUTABLE_PATH" "$ENV_FILE" && \
           sed -i "s|^XRAY_EXECUTABLE_PATH=.*|XRAY_EXECUTABLE_PATH=\"$XRAY_BIN\"|" "$ENV_FILE" || \
           echo "XRAY_EXECUTABLE_PATH=\"$XRAY_BIN\"" >> "$ENV_FILE"
-        echo "📌 Path be .env ezafe shod."
+        echo "📌 مسیر اجرا به فایل .env اضافه شد."
       else
-        echo "⚠️ File .env peyda nashod: $ENV_FILE"
+        echo "⚠️ فایل .env پیدا نشد: $ENV_FILE"
       fi
 
-      echo "🔁 Restart Marzban..."
+      echo "🔁 ریستارت Marzban..."
       marzban restart
-      echo "✅ Taghir heste anjam shod."
+      echo "✅ تغییر هسته انجام شد."
 
-      read -p "Baraye bazgasht be menu Enter bezanid..."
+      read -p "برای بازگشت به منو Enter را فشار دهید..."
       ;;
 
     5)
-      echo "👋 Khorooj az barname. Movafagh bashid!"
+      echo "👋 خروج از برنامه. موفق باشید!"
       exit 0
       ;;
 
     *)
-      echo "❌ Gozine namotabar. Lotfan 1 ta 5 entekhab konid."
+      echo "❌ گزینه نامعتبر. لطفا 1 تا 5 انتخاب کنید."
       sleep 2
       ;;
   esac
