@@ -3,7 +3,7 @@
 # 🔧 Install prerequisites
 echo "Installing prerequisites (unzip and certbot)..."
 apt-get update -y
-apt-get install unzip certbot -y
+apt-get install unzip certbot wget curl -y
 
 # ✅ Main Menu
 while true; do
@@ -136,26 +136,23 @@ while true; do
     4)
       echo ""
       echo "=== Taghir Haste Marzban ==="
-      read -p "🔗 Link delkhah baraye download haste ra vared konid: " HASTE_LINK
+      read -p "🔗 Link delkhah baraye download haste (ZIP format) ra vared konid: " HASTE_LINK
 
-      mkdir -p /var/lib/marzban/xray-core && cd /var/lib/marzban/xray-core
+      mkdir -p /var/lib/marzban/xray-core
+      cd /var/lib/marzban/xray-core || exit
 
       echo "📥 Dar hale download haste..."
-      wget -O xray-core.tar.gz "$HASTE_LINK"
+      wget -O xray-core.zip "$HASTE_LINK"
 
       echo "📦 Dar hale extract..."
-      tar -xf xray-core.tar.gz
-      rm -f xray-core.tar.gz
+      unzip -o xray-core.zip
+      rm -f xray-core.zip
 
       ENV_FILE="/opt/marzban/.env"
 
       if [[ -f "$ENV_FILE" ]]; then
-        # 🧹 Hazf ghadimi ha
         sed -i '/^XRAY_EXECUTABLE_PATH=/d' "$ENV_FILE"
-
-        # ➕ Ezafe kardan jadid
         echo 'XRAY_EXECUTABLE_PATH="/var/lib/marzban/xray-core/xray"' >> "$ENV_FILE"
-
         echo "📌 XRAY_EXECUTABLE_PATH be file .env ezafe shod (ba hazf ghadimi)."
       else
         echo "⚠️ File .env peyda nashod: $ENV_FILE"
