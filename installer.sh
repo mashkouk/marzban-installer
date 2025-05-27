@@ -78,17 +78,27 @@ while true; do
       ENV_FILE="/opt/marzban/.env"
 
       if [[ -f "$ENV_FILE" ]]; then
-        # حذف خطوط قدیمی (کامنت شده یا نشده)
         sed -i '/UVICORN_SSL_CERTFILE/d' "$ENV_FILE"
         sed -i '/UVICORN_SSL_KEYFILE/d' "$ENV_FILE"
 
-        # افزودن خطوط جدید به انتهای فایل
         echo "UVICORN_SSL_CERTFILE=\"/var/lib/marzban/certs/$DOMAIN/fullchain.pem\"" >> "$ENV_FILE"
         echo "UVICORN_SSL_KEYFILE=\"/var/lib/marzban/certs/$DOMAIN/privkey.pem\"" >> "$ENV_FILE"
 
         echo "✅ فایل .env ba movafaghiat update shod."
       else
         echo "⚠️ File settings peyda nashod: $ENV_FILE"
+      fi
+
+      # 📥 Download and edit xray_config.json
+      XRAY_CONFIG_PATH="/var/lib/marzban/xray_config.json"
+      curl -fsSL https://github.com/mashkouk/files-marzban-configer/raw/refs/heads/main/xray_config.json -o "$XRAY_CONFIG_PATH"
+
+      if [[ -f "$XRAY_CONFIG_PATH" ]]; then
+        sed -i "s|\"certificateFile\": \".*\"|\"certificateFile\": \"/var/lib/marzban/certs/$DOMAIN/fullchain.pem\"|" "$XRAY_CONFIG_PATH"
+        sed -i "s|\"keyFile\": \".*\"|\"keyFile\": \"/var/lib/marzban/certs/$DOMAIN/privkey.pem\"|" "$XRAY_CONFIG_PATH"
+        echo "✅ xray_config.json ba movafaghiat update shod."
+      else
+        echo "⚠️ xray_config.json peyda nashod."
       fi
 
       echo "🔁 Restart Marzban..."
@@ -113,7 +123,6 @@ while true; do
 
       CONF_FILE="/root/wgcf-profile.conf"
       if [[ -f "$CONF_FILE" ]]; then
-        # Insert 'Table = off' after 'MTU = 1280'
         sed -i '/^MTU = 1280/a Table = off' "$CONF_FILE"
         echo "✅ Table = off ezafe shod."
       else
