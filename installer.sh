@@ -138,8 +138,7 @@ while true; do
       echo "=== Taghir Haste Marzban ==="
       read -p "🔗 Link delkhah baraye download haste ra vared konid: " HASTE_LINK
 
-      mkdir -p /var/lib/marzban/xray-core
-      cd /var/lib/marzban/xray-core || exit
+      mkdir -p /var/lib/marzban/xray-core && cd /var/lib/marzban/xray-core
 
       echo "📥 Dar hale download haste..."
       wget -O xray-core.tar.gz "$HASTE_LINK"
@@ -148,16 +147,16 @@ while true; do
       tar -xf xray-core.tar.gz
       rm -f xray-core.tar.gz
 
-      XRAY_BIN="/var/lib/marzban/xray-core/xray"
       ENV_FILE="/opt/marzban/.env"
 
       if [[ -f "$ENV_FILE" ]]; then
-        if grep -q "^XRAY_EXECUTABLE_PATH=" "$ENV_FILE"; then
-          sed -i "s|^XRAY_EXECUTABLE_PATH=.*|XRAY_EXECUTABLE_PATH=\"$XRAY_BIN\"|" "$ENV_FILE"
-        else
-          echo "XRAY_EXECUTABLE_PATH=\"$XRAY_BIN\"" >> "$ENV_FILE"
-        fi
-        echo "📌 XRAY_EXECUTABLE_PATH be file .env ezafe ya update shod."
+        # 🧹 Hazf ghadimi ha
+        sed -i '/^XRAY_EXECUTABLE_PATH=/d' "$ENV_FILE"
+
+        # ➕ Ezafe kardan jadid
+        echo 'XRAY_EXECUTABLE_PATH="/var/lib/marzban/xray-core/xray"' >> "$ENV_FILE"
+
+        echo "📌 XRAY_EXECUTABLE_PATH be file .env ezafe shod (ba hazf ghadimi)."
       else
         echo "⚠️ File .env peyda nashod: $ENV_FILE"
       fi
