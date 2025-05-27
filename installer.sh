@@ -3,7 +3,7 @@
 # 🔧 Install prerequisites
 echo "Installing prerequisites (unzip and certbot)..."
 apt-get update -y
-apt-get install unzip certbot curl wget -y
+apt-get install unzip certbot -y
 
 # ✅ Main Menu
 while true; do
@@ -12,7 +12,7 @@ while true; do
   echo "1. Nasb Panel Marzban"
   echo "2. Gereftan Certificate (SSL)"
   echo "3. Nasb Warp (WARP)"
-  echo "4. Taghir Haste Xray"
+  echo "4. Taghir Haste"
   echo "5. Khorooj"
   echo "======================"
   read -p "Lotfan shomare gozine ra vared konid: " choice
@@ -40,10 +40,8 @@ while true; do
         echo "⚠️ File settings peyda nashod: $ENV_FILE"
       fi
 
-      # Replace docker-compose.yml
       curl -fsSL https://raw.githubusercontent.com/mashkouk/files-marzban-configer/refs/heads/main/docker-compose.yml -o /opt/marzban/docker-compose.yml
 
-      # Extract app.zip
       curl -fsSL https://raw.githubusercontent.com/mashkouk/files-marzban-configer/refs/heads/main/app.zip -o /tmp/app.zip
       unzip -o /tmp/app.zip -d /var/lib/marzban/
       rm /tmp/app.zip
@@ -55,7 +53,6 @@ while true; do
       marzban cli admin create --sudo
 
       echo "✅ Panel ba movafaghiat nasb shod."
-
       read -p "Baraye bazgasht be menu Enter bezanid..."
       ;;
 
@@ -84,13 +81,11 @@ while true; do
 
         echo "UVICORN_SSL_CERTFILE=\"/var/lib/marzban/certs/$DOMAIN/fullchain.pem\"" >> "$ENV_FILE"
         echo "UVICORN_SSL_KEYFILE=\"/var/lib/marzban/certs/$DOMAIN/privkey.pem\"" >> "$ENV_FILE"
-
-        echo "✅ فایل .env ba movafaghiat update shod."
+        echo "✅ File .env ba movafaghiat update shod."
       else
         echo "⚠️ File settings peyda nashod: $ENV_FILE"
       fi
 
-      # 📥 Download and edit xray_config.json
       XRAY_CONFIG_PATH="/var/lib/marzban/xray_config.json"
       curl -fsSL https://github.com/mashkouk/files-marzban-configer/raw/refs/heads/main/xray_config.json -o "$XRAY_CONFIG_PATH"
 
@@ -105,7 +100,6 @@ while true; do
       echo "🔁 Restart Marzban..."
       marzban restart
       echo "✅ SSL gerefte shod."
-
       read -p "Baraye bazgasht be menu Enter bezanid..."
       ;;
 
@@ -136,67 +130,51 @@ while true; do
       echo "🔁 Restart Marzban..."
       marzban restart
       echo "✅ Warp ba movafaghiat nasb shod."
-
       read -p "Baraye bazgasht be menu Enter bezanid..."
       ;;
 
     4)
       echo ""
-      echo "🧠 Taghir heste Marzban"
+      echo "=== Taghir Haste Marzban ==="
+      read -p "🔗 Link delkhah baraye download haste ra vared konid: " HASTE_LINK
 
-      CORE_DIR="/var/lib/marzban/xray-core"
-      mkdir -p "$CORE_DIR"
-      TEMP_ZIP="/tmp/xray-core.zip"
+      mkdir -p /var/lib/marzban/xray-core
+      cd /var/lib/marzban/xray-core || exit
 
-      read -p "🔗 linke haste delkhah ra vared konid: " DOWNLOAD_URL
+      echo "📥 Dar hale download haste..."
+      wget -O xray-core.tar.gz "$HASTE_LINK"
 
-      echo "⬇️ dar hale download: $DOWNLOAD_URL"
-      wget -O "$TEMP_ZIP" "$DOWNLOAD_URL"
+      echo "📦 Dar hale extract..."
+      tar -xf xray-core.tar.gz
+      rm -f xray-core.tar.gz
 
-      if [[ $? -ne 0 ]]; then
-        echo "❌ download namovafagh."
-        rm -f "$TEMP_ZIP"
-        read -p "baraye bazgasht be menu inter ra bezanid ..."
-        continue
-      fi
-
-      unzip -o "$TEMP_ZIP" -d "$CORE_DIR"
-      rm -f "$TEMP_ZIP"
-
-      XRAY_BIN="$CORE_DIR/xray"
-      if [[ -f "$XRAY_BIN" ]]; then
-        chmod +x "$XRAY_BIN"
-        echo "✅ haste ba movafaghiat dar $XRAY_BIN gharar gereft."
-      else
-        echo "❌ fayle ejraee xray peyda nashod: $CORE_DIR"
-        read -p "baraye bazgasht be menu inter ra bezanid..."
-        continue
-      fi
-
+      XRAY_BIN="/var/lib/marzban/xray-core/xray"
       ENV_FILE="/opt/marzban/.env"
+
       if [[ -f "$ENV_FILE" ]]; then
-        grep -q "XRAY_EXECUTABLE_PATH" "$ENV_FILE" && \
-          sed -i "s|^XRAY_EXECUTABLE_PATH=.*|XRAY_EXECUTABLE_PATH=\"$XRAY_BIN\"|" "$ENV_FILE" || \
+        if grep -q "^XRAY_EXECUTABLE_PATH=" "$ENV_FILE"; then
+          sed -i "s|^XRAY_EXECUTABLE_PATH=.*|XRAY_EXECUTABLE_PATH=\"$XRAY_BIN\"|" "$ENV_FILE"
+        else
           echo "XRAY_EXECUTABLE_PATH=\"$XRAY_BIN\"" >> "$ENV_FILE"
-        echo "📌masire ejra be file .env ezafe shod."
+        fi
+        echo "📌 XRAY_EXECUTABLE_PATH be file .env ezafe ya update shod."
       else
-        echo "⚠️ file .env peyda nashod: $ENV_FILE"
+        echo "⚠️ File .env peyda nashod: $ENV_FILE"
       fi
 
-      echo "🔁 ریستارت Marzban..."
+      echo "🔁 Restart Marzban..."
       marzban restart
-      echo "✅ taghir haste anjam shod..."
-
-      read -p "baraye bazgasht be menu inter ra bezanid..."
+      echo "✅ Haste jadid nasb shod."
+      read -p "Baraye bazgasht be menu Enter bezanid..."
       ;;
 
     5)
-      echo "👋 exit , movafagh bashid !"
+      echo "👋 Khorooj az barname. Movafagh bashid!"
       exit 0
       ;;
 
     *)
-      echo "❌ گزینه نامعتبر. لطفا 1 تا 5 انتخاب کنید."
+      echo "❌ Gozine namotabar. Lotfan 1 ta 5 entekhab konid."
       sleep 2
       ;;
   esac
