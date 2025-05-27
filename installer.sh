@@ -12,7 +12,7 @@ while true; do
   echo "1. Nasb Panel Marzban"
   echo "2. Gereftan Certificate (SSL)"
   echo "3. Nasb Warp (WARP)"
-  echo "4. Taghir Heste Xray"
+  echo "4. Taghir Haste Xray"
   echo "5. Khorooj"
   echo "======================"
   read -p "Lotfan shomare gozine ra vared konid: " choice
