@@ -3,7 +3,7 @@
 # 🔧 Install prerequisites
 echo "Installing prerequisites (unzip and certbot)..."
 apt-get update -y
-apt-get install unzip certbot -y
+apt-get install unzip certbot curl wget -y
 
 # ✅ Main Menu
 while true; do
@@ -12,7 +12,8 @@ while true; do
   echo "1. Nasb Panel Marzban"
   echo "2. Gereftan Certificate (SSL)"
   echo "3. Nasb Warp (WARP)"
-  echo "4. Khorooj"
+  echo "4. Taghir Heste Xray"
+  echo "5. Khorooj"
   echo "======================"
   read -p "Lotfan shomare gozine ra vared konid: " choice
 
@@ -140,12 +141,105 @@ while true; do
       ;;
 
     4)
+      echo ""
+      echo "🧠 Taghir heste Marzban"
+
+      ARCH=$(uname -m)
+      case "$ARCH" in
+        x86_64)
+          ARCH_DL="amd64"
+          ;;
+        aarch64 | arm64)
+          ARCH_DL="arm64"
+          ;;
+        *)
+          echo "⚠️ معماری ناشناخته: $ARCH"
+          read -p "Baraye bazgasht be menu Enter bezanid..."
+          continue
+          ;;
+      esac
+
+      LATEST_XRAY_VERSION=$(curl -s https://api.github.com/repos/XTLS/Xray-core/releases/latest | grep tag_name | cut -d '"' -f4)
+      XRAY_URL="https://github.com/XTLS/Xray-core/releases/download/${LATEST_XRAY_VERSION}/Xray-linux-${ARCH_DL}.zip"
+
+      LATEST_GFW_VERSION=$(curl -s https://api.github.com/repos/GFW-knocker/Xray-core/releases/latest | grep tag_name | cut -d '"' -f4)
+      GFW_URL="https://github.com/GFW-knocker/Xray-core/releases/download/${LATEST_GFW_VERSION}/Xray-linux-${ARCH_DL}.zip"
+
+      echo ""
+      echo "🔧 Gozine mored nazar ra entekhab konid:"
+      echo "1. Xray-core rasmi (XTLS) - $LATEST_XRAY_VERSION"
+      echo "2. Xray-core GFW-knocker - $LATEST_GFW_VERSION"
+      echo "3. Link delkhah"
+      read -p "Shomare gozine ra vared konid: " CORE_CHOICE
+
+      case $CORE_CHOICE in
+        1)
+          DOWNLOAD_URL="$XRAY_URL"
+          ;;
+        2)
+          DOWNLOAD_URL="$GFW_URL"
+          ;;
+        3)
+          read -p "🔗 Link delkhah ra vared konid: " DOWNLOAD_URL
+          ;;
+        *)
+          echo "❌ Gozine namotabar."
+          read -p "Baraye bazgasht be menu Enter bezanid..."
+          continue
+          ;;
+      esac
+
+      CORE_DIR="/var/lib/marzban/xray-core"
+      mkdir -p "$CORE_DIR"
+      TEMP_ZIP="/tmp/xray-core.zip"
+
+      echo "⬇️ Dar hale download az: $DOWNLOAD_URL"
+      wget -O "$TEMP_ZIP" "$DOWNLOAD_URL"
+
+      if [[ $? -ne 0 ]]; then
+        echo "❌ دانلود ناموفق بود."
+        rm -f "$TEMP_ZIP"
+        read -p "Baraye bazgasht be menu Enter bezanid..."
+        continue
+      fi
+
+      unzip -o "$TEMP_ZIP" -d "$CORE_DIR"
+      rm -f "$TEMP_ZIP"
+
+      XRAY_BIN="$CORE_DIR/xray"
+      if [[ -f "$XRAY_BIN" ]]; then
+        chmod +x "$XRAY_BIN"
+        echo "✅ Heste ba movafaghiat dar $XRAY_BIN gharar gereft."
+      else
+        echo "❌ فایل اجرایی xray پیدا نشد در: $CORE_DIR"
+        read -p "Baraye bazgasht be menu Enter bezanid..."
+        continue
+      fi
+
+      ENV_FILE="/opt/marzban/.env"
+      if [[ -f "$ENV_FILE" ]]; then
+        grep -q "XRAY_EXECUTABLE_PATH" "$ENV_FILE" && \
+          sed -i "s|^XRAY_EXECUTABLE_PATH=.*|XRAY_EXECUTABLE_PATH=\"$XRAY_BIN\"|" "$ENV_FILE" || \
+          echo "XRAY_EXECUTABLE_PATH=\"$XRAY_BIN\"" >> "$ENV_FILE"
+        echo "📌 Path be .env ezafe shod."
+      else
+        echo "⚠️ File .env peyda nashod: $ENV_FILE"
+      fi
+
+      echo "🔁 Restart Marzban..."
+      marzban restart
+      echo "✅ Taghir heste anjam shod."
+
+      read -p "Baraye bazgasht be menu Enter bezanid..."
+      ;;
+
+    5)
       echo "👋 Khorooj az barname. Movafagh bashid!"
       exit 0
       ;;
 
     *)
-      echo "❌ Gozine namotabar. Lotfan 1 ta 4 entekhab konid."
+      echo "❌ Gozine namotabar. Lotfan 1 ta 5 entekhab konid."
       sleep 2
       ;;
   esac
