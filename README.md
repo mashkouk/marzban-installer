@@ -3,5 +3,5 @@
 اجرا با دستور زیر
 
 ```
-bash <(curl -Ls https://raw.githubusercontent.com/mashkouk/marzban-installer/refs/heads/main/installer.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/mashkouk/marzban-installer/main/installer.sh)
 ```
