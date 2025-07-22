@@ -53,12 +53,6 @@ mv /root/wgcf-profile.conf /etc/wireguard/warp.conf
 # اجرای سرویس WireGuard با warp
 systemctl enable --now wg-quick@warp
 
-# ریستارت Marzban در صورت موجود بودن
-if command -v marzban &> /dev/null; then
-  echo "🔁 Restart Marzban..."
-  marzban restart
-fi
-
 echo "✅ Warp ba movafaghiat nasb shod."
 
 # دریافت زمان دلخواه از کاربر برای بروزرسانی خودکار
